@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.spark.config.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,7 @@ public class UserService {
                if (user.getLastName() != null && !user.getLastName().isEmpty()) newUser.setLastName(user.getLastName());
                if (user.getEmail() != null && !user.getEmail().isEmpty()) newUser.setEmail(user.getEmail());
                if (user.getPassword() != null && !user.getPassword().isEmpty()) newUser.setPassword(user.getPassword());
+               if(user.getGender()!=null && !user.getGender().isEmpty()) newUser.setGender(user.getGender());
                userRepo.save(newUser);
                return newUser;
           }
@@ -54,21 +56,14 @@ public class UserService {
           return userRepo.findByEmail(email);
      }
 
-     public User followUser(Integer uId1, Integer uId2) {
-          User user1 = getUserById(uId1);
+     public User followUser(Integer reqUserId, Integer uId2) {
+          User reqUser = getUserById(reqUserId);
           User user2 = getUserById(uId2);
-          if (user1 != null && user2 != null) {
-               List<Integer> followers = Optional.ofNullable(user1.getFollowers()).orElse(new ArrayList<>());
-               List<Integer> followings = Optional.ofNullable(user2.getFollowings()).orElse(new ArrayList<>());
-               followers.add(uId2);
-               followings.add(uId1);
-               user1.setFollowers(followers);
-               user2.setFollowings(followings);
-               userRepo.save(user1);
-               userRepo.save(user2);
-               return user1;
-          }
-          return null;
+          user2.getFollowers().add(reqUser.getId());
+          reqUser.getFollowers().add(user2.getId());
+            userRepo.save(reqUser);
+            userRepo.save(user2);
+          return reqUser;
      }
 
      public List<User> searchUser(String query) {
@@ -77,5 +72,10 @@ public class UserService {
                return users;
           }
           return new ArrayList<>();
+     }
+
+     public User findUserByJwt(String jwt) {
+          String email = JwtProvider.getEmailFromJwtToken(jwt);
+          return userRepo.findByEmail(email);
      }
 }

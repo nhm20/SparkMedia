@@ -15,10 +15,7 @@ import com.spark.services.UserService;
 public class UserController {
      @Autowired
      private UserService userService;
-     @PostMapping("/register")
-     public User createUser(@RequestBody User user) {
-          return userService.registerUser(user);
-     }
+
      @GetMapping("/api/{id}")
      public User getUserById(@PathVariable Integer id) {
           User user = userService.getUserById(id);
@@ -27,27 +24,43 @@ public class UserController {
           }
           return null;
      }
-     @PutMapping("/api/update/{id}")
-     public User updateUser(@PathVariable("id")Integer userId,@RequestBody User user) throws Exception {
-          return userService.updateUser(userId,user);
+     @PutMapping("/api/update")
+     public User updateUser(@RequestHeader("Authorization")String jwt,@RequestBody User user) throws Exception {
+          User reqUser= userService.findUserByJwt(jwt);
+          User updatedUser= userService.updateUser(reqUser.getId(),user);
+          return updatedUser;
      }
      @DeleteMapping("/api/delete/{id}")
      public String deleteUser(@PathVariable Integer id) {
           return userService.deleteUser(id);
      }
 
-     @GetMapping("/api/follow/{userId}/{followerId}")
-     public User followUserHandle(@PathVariable Integer userId, @PathVariable Integer followerId) {
-          return userService.followUser(userId, followerId);
+     @GetMapping("/api/follow/{followerId}")
+     public User followUserHandle(@RequestHeader("Authorization") String jwt, @PathVariable Integer followerId) {
+          User reqUser= userService.findUserByJwt(jwt);
+          User user=userService.followUser(reqUser.getId(),followerId);
+          return user;
      }
+
      @GetMapping("/api/searchbymail")
      public User getUserByEmail(@RequestParam("email") String email) {
           return userService.getUserByEmail(email);
      }
+
      @GetMapping("/api/search")
      public List<User> searchUser(@RequestParam("query") String query) {
           return userService.searchUser(query);
      }
 
 
+     @GetMapping("/api/users/profile")
+     public User getUserFromToken(@RequestHeader("Authorization") String jwt) {
+          User user= userService.findUserByJwt(jwt);
+          return user;
+     }
+
+     @GetMapping("/api/users")
+        public List<User> getUsers() {
+            return userService.getUsers();
+        }
 }
