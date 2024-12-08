@@ -1,8 +1,10 @@
 package com.spark.controller;
 
 import com.spark.model.Post;
+import com.spark.model.User;
 import com.spark.response.ApiResponse;
 import com.spark.services.PostService;
+import com.spark.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,19 +13,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/api/posts")
 public class PostController {
     @Autowired
     private PostService postService;
 
-    @PostMapping("/user/")
-    public ResponseEntity<Post> createPost(@RequestBody Post post,@PathVariable Integer userId) {
-        return ResponseEntity.ok(postService.createPost(post, userId));
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/create")
+    public ResponseEntity<Post> createPost(@RequestHeader("Authorization")String jwt, @RequestBody Post post) {
+        User reqUser = userService.findUserByJwt(jwt);
+        return ResponseEntity.ok(postService.createPost(post, reqUser.getId()));
     }
 
-    @DeleteMapping("/{postId}/user/{userId}")
-    public ResponseEntity<ApiResponse> deletePost(@PathVariable Integer postId, @PathVariable Integer userId) {
-        String msg=postService.deletePost(postId, userId);
+    @DeleteMapping("/delete/{postId}")
+    public ResponseEntity<ApiResponse> deletePost(@RequestHeader("Authorization")String jwt,@PathVariable Integer postId) {
+        User reqUser = userService.findUserByJwt(jwt);
+        String msg=postService.deletePost(postId, reqUser.getId());
         ApiResponse res=new ApiResponse(msg,true);
         return new ResponseEntity<ApiResponse>(res, HttpStatus.OK);
     }
@@ -46,17 +53,18 @@ public class PostController {
         return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
     }
 
-    @PutMapping("/save/{postId}/user/{userId}")
-    public ResponseEntity<Post> savedPostHandler(@PathVariable Integer postId, @PathVariable Integer userId) {
-        Post post = postService.savedPost(postId, userId);
+    @PutMapping("/save/{postId}")
+    public ResponseEntity<Post> savedPostHandler(@RequestHeader("Authorization")String jwt,@PathVariable Integer postId) {
+        User reqUser = userService.findUserByJwt(jwt);
+        Post post = postService.savedPost(postId, reqUser.getId());
         return new ResponseEntity<Post>(post, HttpStatus.ACCEPTED);
     }
-    @PutMapping("/like/{postId}/user/{userId}")
-    public ResponseEntity<Post> likePostHandler(@PathVariable Integer postId, @PathVariable Integer userId) {
-        Post post = postService.likePost(postId, userId);
+    @PutMapping("/like/{postId}")
+    public ResponseEntity<Post> likePostHandler(@RequestHeader("Authorization")String jwt,@PathVariable Integer postId) {
+        User reqUser = userService.findUserByJwt(jwt);
+        Post post = postService.likePost(postId, reqUser.getId());
         return new ResponseEntity<Post>(post, HttpStatus.ACCEPTED);
     }
-
 }
 
 
