@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.spark.Exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class UserController {
      private UserService userService;
 
      @GetMapping("/api/{id}")
-     public User getUserById(@PathVariable Integer id) {
+     public User getUserById(@PathVariable Long id) throws UserException {
           User user = userService.getUserById(id);
           if (user != null) {
                return user;
@@ -31,12 +32,12 @@ public class UserController {
           return updatedUser;
      }
      @DeleteMapping("/api/delete/{id}")
-     public String deleteUser(@PathVariable Integer id) {
+     public String deleteUser(@PathVariable Long id) {
           return userService.deleteUser(id);
      }
 
      @GetMapping("/api/follow/{followerId}")
-     public User followUserHandle(@RequestHeader("Authorization") String jwt, @PathVariable Integer followerId) {
+     public User followUserHandle(@RequestHeader("Authorization") String jwt, @PathVariable Long followerId)throws UserException {
           User reqUser= userService.findUserByJwt(jwt);
           User user=userService.followUser(reqUser.getId(),followerId);
           return user;

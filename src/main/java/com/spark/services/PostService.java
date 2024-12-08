@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.spark.Exceptions.UserException;
 import com.spark.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class PostService {
      private UserService userService;
      @Autowired
      private UserRepository userRepo;
-     public Post createPost(Post post, Integer userId) {
+     public Post createPost(Post post, Long userId)throws UserException {
           User user = userService.getUserById(userId);
           Post newPost = new Post();
           newPost.setCaption(post.getCaption());
@@ -33,7 +34,7 @@ public class PostService {
           return newPost;
      }
 
-     public String deletePost(Integer pid,Integer uid) {
+     public String deletePost(Long pid,Long uid)throws UserException  {
           Optional<Post> post = postRepo.findById(pid);
           User user = userService.getUserById(uid);
           if(post.isPresent()) {
@@ -46,11 +47,11 @@ public class PostService {
           return null;
      }
 
-     public List<Post> findPostsByUser(Integer userId) {
+     public List<Post> findPostsByUser(Long userId) {
           return postRepo.findPostByUserId(userId);
      }
 
-     public Post findPostById(Integer postId) {
+     public Post findPostById(Long postId) {
           Optional<Post> opt=postRepo.findById(postId);
             if(opt.isPresent()) {
                  return opt.get();
@@ -62,7 +63,7 @@ public class PostService {
           return postRepo.findAll();
      }
 
-     public Post savedPost(Integer pid,Integer uid) {
+     public Post savedPost(Long pid,Long uid)throws UserException  {
            Post post = findPostById(pid);
            User user = userService.getUserById(uid);
            if(user.getSavedPost().contains(post)) {
@@ -74,7 +75,7 @@ public class PostService {
            userRepo.save(user);
           return post;
      }
-     public Post likePost(Integer pid,Integer uid) {
+     public Post likePost(Long pid,Long uid) throws UserException {
           Post post = findPostById(pid);
             User user = userService.getUserById(uid);
             if(post.getLiked().contains(user)) {

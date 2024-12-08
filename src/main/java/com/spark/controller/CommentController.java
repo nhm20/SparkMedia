@@ -15,7 +15,7 @@ public class CommentController {
     @Autowired
     private UserService userService;
     @PostMapping("/create/post/{postId}")
-    public Comment createComment(@RequestBody Comment comment, @RequestHeader("Authorization")String jwt, @PathVariable("postId") Integer postId) throws Exception {
+    public Comment createComment(@RequestBody Comment comment, @RequestHeader("Authorization")String jwt, @PathVariable("postId") Long postId) throws Exception {
         User user=userService.findUserByJwt(jwt);
         Comment createdComment=commentService.createComment(comment,postId,user.getId());
         return createdComment;

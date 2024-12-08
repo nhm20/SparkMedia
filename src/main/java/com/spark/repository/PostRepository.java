@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface PostRepository extends JpaRepository<Post, Integer> {
+public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p WHERE p.user.id =:userId")
-    public List<Post>findPostByUserId(Integer userId);
+    public List<Post>findPostByUserId(Long userId);
 
 }

@@ -16,13 +16,13 @@ import lombok.NoArgsConstructor;
 public class User {
      @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
-     private Integer id;
+     private Long id;
      private String firstName;
      private String lastName;
      private String email;
      private String password;
-     private List<Integer> followers=new ArrayList<>();
-     private List<Integer> followings=new ArrayList<>();
+     private List<Long> followers=new ArrayList<>();
+     private List<Long> followings=new ArrayList<>();
      @ManyToMany
      private List<Post>savedPost=new ArrayList<>();
      private String gender;

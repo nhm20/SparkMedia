@@ -25,7 +25,7 @@ public class CommentService {
     @Autowired
     private PostRepository postRepository;
 
-    public Comment createComment(Comment comment, Integer postId, Integer userId) throws Exception {
+    public Comment createComment(Comment comment, Long postId, Long userId) throws Exception {
         User user=userService.getUserById(userId);
         Post post=postService.findPostById(postId);
         comment.setUser(user);
@@ -43,7 +43,7 @@ public class CommentService {
         }
         return opt.get();
     }
-    public Comment likeComment(Long commentId, Integer userId) throws Exception {
+    public Comment likeComment(Long commentId, Long userId) throws Exception {
         Comment comment = getCommentById(commentId);
         User user = userService.getUserById(userId);
         if(!comment.getLiked().contains(user)){

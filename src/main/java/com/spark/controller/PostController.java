@@ -1,5 +1,6 @@
 package com.spark.controller;
 
+import com.spark.Exceptions.UserException;
 import com.spark.model.Post;
 import com.spark.model.User;
 import com.spark.response.ApiResponse;
@@ -22,13 +23,13 @@ public class PostController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<Post> createPost(@RequestHeader("Authorization")String jwt, @RequestBody Post post) {
+    public ResponseEntity<Post> createPost(@RequestHeader("Authorization")String jwt, @RequestBody Post post) throws UserException {
         User reqUser = userService.findUserByJwt(jwt);
         return ResponseEntity.ok(postService.createPost(post, reqUser.getId()));
     }
 
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<ApiResponse> deletePost(@RequestHeader("Authorization")String jwt,@PathVariable Integer postId) {
+    public ResponseEntity<ApiResponse> deletePost(@RequestHeader("Authorization")String jwt,@PathVariable Long postId) throws UserException {
         User reqUser = userService.findUserByJwt(jwt);
         String msg=postService.deletePost(postId, reqUser.getId());
         ApiResponse res=new ApiResponse(msg,true);
@@ -36,13 +37,13 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> findPostByIdHandler(@PathVariable Integer postId) {
+    public ResponseEntity<Post> findPostByIdHandler(@PathVariable Long postId) {
         Post post = postService.findPostById(postId);
         return new ResponseEntity<Post>(post, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Post>> findUsersPost(@PathVariable Integer userId) {
+    public ResponseEntity<List<Post>> findUsersPost(@PathVariable Long userId) {
         List<Post> posts = postService.findPostsByUser(userId);
         return new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
     }
@@ -54,13 +55,13 @@ public class PostController {
     }
 
     @PutMapping("/save/{postId}")
-    public ResponseEntity<Post> savedPostHandler(@RequestHeader("Authorization")String jwt,@PathVariable Integer postId) {
+    public ResponseEntity<Post> savedPostHandler(@RequestHeader("Authorization")String jwt,@PathVariable Long postId)throws UserException  {
         User reqUser = userService.findUserByJwt(jwt);
         Post post = postService.savedPost(postId, reqUser.getId());
         return new ResponseEntity<Post>(post, HttpStatus.ACCEPTED);
     }
     @PutMapping("/like/{postId}")
-    public ResponseEntity<Post> likePostHandler(@RequestHeader("Authorization")String jwt,@PathVariable Integer postId) {
+    public ResponseEntity<Post> likePostHandler(@RequestHeader("Authorization")String jwt,@PathVariable Long postId) throws UserException {
         User reqUser = userService.findUserByJwt(jwt);
         Post post = postService.likePost(postId, reqUser.getId());
         return new ResponseEntity<Post>(post, HttpStatus.ACCEPTED);
